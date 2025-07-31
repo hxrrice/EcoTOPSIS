@@ -12,7 +12,7 @@ This app applies the TOPSIS (Technique for Order Preference by Similarity to Ide
 
 How It Works:
 1. Upload a dataset (CSV/Excel) with alternatives and numerical criteria.
-2. Enter weights and impacts for each criterion using sliders.
+2. Enter weights and impacts for each criterion using sliders and dropdowns.
 3. View the ranking and download the result.
 """)
 
@@ -54,11 +54,16 @@ criteria = df.columns[1:]  # All columns except 'Alternative'
 # Sidebar sliders for each criterion's weight
 weights = []
 total_weight = 0
+impacts = []
 
 for i, criterion in enumerate(criteria):
     weight = st.sidebar.slider(f"Weight for {criterion}", 0.0, 1.0, 1/len(criteria), step=0.01)
     weights.append(weight)
     total_weight += weight
+    
+    # Sidebar dropdown for impact type (+ for benefit, - for cost)
+    impact = st.sidebar.selectbox(f"Impact for {criterion}", options=["+", "-"], key=criterion)
+    impacts.append(impact)
 
 # Adjust the last slider if the total weight exceeds 1
 if total_weight > 1.0:
@@ -67,21 +72,6 @@ if total_weight > 1.0:
 
 # Display weights for the user
 st.sidebar.write(f"Total weight: {sum(weights)} (adjusted to 1 if necessary)")
-impacts = st.sidebar.text_input("Enter impacts for each criterion (+ for benefit, - for cost):", ",".join(["-"] + ["+"] * (len(criteria) - 1)))
-
-try:
-    impacts = list(map(str.strip, impacts.strip().split(',')))
-
-    if len(impacts) != len(criteria):
-        st.error("Number of weights and impacts must match number of criteria.")
-        st.stop()
-
-    if not all(impact in ["+", "-"] for impact in impacts):
-        st.error("Impacts must be '+' or '-'.")
-        st.stop()
-except Exception as e:
-    st.error(f"Invalid format for impacts. Error: {str(e)}")
-    st.stop()
 
 # ---------- Normalize Matrix ----------
 matrix = df.iloc[:, 1:].astype(float)
