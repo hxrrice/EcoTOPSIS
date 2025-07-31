@@ -42,23 +42,37 @@ else:
     st.info("No file uploaded. Using example data.")
     df = get_example_data()
 
-# ---------- Input Weights and Impacts ----------
-st.subheader("Input Weights and Impacts")
+# ---------- Input Weights and Impacts (Sidebar) ----------
+st.sidebar.subheader("Input Weights and Impacts")
 
 if df.shape[1] < 3:
     st.error("Please upload a dataset with at least one alternative column and two numeric criteria.")
     st.stop()
 
 criteria = df.columns[1:]
-default_weights = [round(1 / len(criteria), 2)] * len(criteria)
-weights = st.text_input("Enter weights (comma-separated):", ",".join(map(str, default_weights)))
-impacts = st.text_input("Enter impacts for each criterion (+ for benefit, - for cost):", ",".join(["-"] + ["+"] * (len(criteria) - 1)))
+
+# Sidebar sliders for each criterion's weight
+weights = []
+total_weight = 0
+
+for i, criterion in enumerate(criteria):
+    weight = st.sidebar.slider(f"Weight for {criterion}", 0.0, 1.0, 1/len(criteria), step=0.01)
+    weights.append(weight)
+    total_weight += weight
+
+# Ensure the total weight is 1 (if it's not, adjust the last one)
+if total_weight != 1.0:
+    st.sidebar.warning(f"Warning: The sum of weights is {total_weight:.2f}. Adjusting the last weight to ensure the sum is 1.")
+    weights[-1] = 1.0 - sum(weights[:-1])
+
+# Display weights for the user
+st.sidebar.write(f"Total weight: {sum(weights)} (adjusted to 1 if necessary)")
+impacts = st.sidebar.text_input("Enter impacts for each criterion (+ for benefit, - for cost):", ",".join(["-"] + ["+"] * (len(criteria) - 1)))
 
 try:
-    weights = list(map(float, weights.strip().split(',')))
     impacts = list(map(str.strip, impacts.strip().split(',')))
 
-    if len(weights) != len(criteria) or len(impacts) != len(criteria):
+    if len(impacts) != len(criteria):
         st.error("Number of weights and impacts must match number of criteria.")
         st.stop()
 
@@ -66,7 +80,7 @@ try:
         st.error("Impacts must be '+' or '-'.")
         st.stop()
 except Exception as e:
-    st.error(f"Invalid format for weights or impacts. Error: {str(e)}")
+    st.error(f"Invalid format for impacts. Error: {str(e)}")
     st.stop()
 
 # ---------- Normalize Matrix ----------
