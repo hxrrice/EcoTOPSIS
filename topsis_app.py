@@ -110,7 +110,12 @@ def convert_df(df):
 with pd.ExcelWriter(output, engine='openpyxl') as writer:
 
         df.to_excel(writer, index=False, sheet_name='TOPSIS Result')
+    def convert_df(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='TOPSIS Result')
     return output.getvalue()
+
 
 st.download_button(
     label="📥 Download Result as Excel",
