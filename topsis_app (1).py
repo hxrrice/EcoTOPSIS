@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from io import BytesIO
 
 st.set_page_config(page_title="EcoTOPSIS Ranking App", layout="centered")
@@ -13,7 +14,7 @@ This app applies the TOPSIS (Technique for Order Preference by Similarity to Ide
 How It Works:
 1. Upload a dataset (CSV/Excel) with alternatives and numerical criteria.
 2. Enter weights and impacts for each criterion using sliders and dropdowns.
-3. View the ranking and download the result.
+3. View the ranking, download the result, and see the horizontal bar chart.
 """)
 
 # ---------- Example Dataset ----------
@@ -36,11 +37,6 @@ if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
         else:
             df = pd.read_excel(uploaded_file)
-
-        # Check and rename the first column to "Alternative" if necessary
-        if df.columns[0] != "Alternative":
-            df.columns = ["Alternative"] + list(df.columns[1:])
-            st.warning("The first column has been renamed to 'Alternative'.")
     except Exception as e:
         st.error(f"Failed to read file. Ensure it is a valid CSV or Excel file. Error: {str(e)}")
 else:
@@ -129,6 +125,14 @@ df_result["Rank"] = df_result["Closeness"].rank(method='max', ascending=False).a
 df_result.sort_values("Rank", inplace=True)
 
 st.write(df_result.style.highlight_max("Closeness", axis=0, color="lightgreen"))
+
+# ---------- Horizontal Bar Chart (Ranking) ----------
+st.subheader("Ranking Bar Chart")
+plt.figure(figsize=(10, 6))
+plt.barh(df_result["Alternative"], df_result["Closeness"], color='skyblue')
+plt.xlabel('Closeness to Ideal Solution')
+plt.title('Ranking of Alternatives Based on Closeness to Ideal Solution')
+st.pyplot(plt)
 
 # ---------- Show Intermediate Matrices ----------
 with st.expander("Show Normalized and Weighted Matrices"):
