@@ -36,16 +36,16 @@ if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
         else:
             df = pd.read_excel(uploaded_file)
+
+        # Check if the first column is named "Alternative"
+        if df.columns[0] != "Alternative":
+            df.columns = ["Alternative"] + list(df.columns[1:])
+            st.warning("The first column is renamed to 'Alternative'.")
     except Exception as e:
         st.error(f"Failed to read file. Ensure it is a valid CSV or Excel file. Error: {str(e)}")
 else:
     st.info("No file uploaded. Using example data.")
     df = get_example_data()
-
-# Ensure 'Alternative' column exists
-if 'Alternative' not in df.columns:
-    st.error("'Alternative' column is missing from the dataset. Please ensure the first column is named 'Alternative'.")
-    st.stop()
 
 # ---------- Input Weights and Impacts ----------
 st.subheader("Input Weights and Impacts")
