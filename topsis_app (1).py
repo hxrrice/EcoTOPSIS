@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,7 +7,14 @@ st.set_page_config(page_title="EcoTOPSIS Ranking App", layout="centered")
 
 # ---------- Title & Description ----------
 st.title("EcoTOPSIS: Sustainable Ranking App")
-st.markdown("This app applies the TOPSIS method to rank alternatives based on multiple criteria.")
+st.markdown("""
+This app applies the TOPSIS (Technique for Order Preference by Similarity to Ideal Solution) method to rank alternatives based on multiple criteria.
+
+How It Works:
+1. Upload a dataset (CSV/Excel) with alternatives and numerical criteria.
+2. Enter weights and impacts for each criterion.
+3. View the ranking and download the result.
+""")
 
 # ---------- Example Dataset ----------
 def get_example_data():
@@ -100,7 +106,7 @@ with st.expander("Show Normalized and Weighted Matrices"):
 # ---------- Downloadable Output ----------
 def convert_df(df):
     output = BytesIO()
-   with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='TOPSIS Result')
     return output.getvalue()
 
