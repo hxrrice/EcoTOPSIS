@@ -42,6 +42,11 @@ else:
     st.info("No file uploaded. Using example data.")
     df = get_example_data()
 
+# Ensure 'Alternative' column exists
+if 'Alternative' not in df.columns:
+    st.error("'Alternative' column is missing from the dataset. Please ensure the first column is named 'Alternative'.")
+    st.stop()
+
 # ---------- Input Weights and Impacts ----------
 st.subheader("Input Weights and Impacts")
 
@@ -49,7 +54,7 @@ if df.shape[1] < 3:
     st.error("Please upload a dataset with at least one alternative column and two numeric criteria.")
     st.stop()
 
-criteria = df.columns[1:]
+criteria = df.columns[1:]  # All columns except 'Alternative'
 default_weights = [round(1 / len(criteria), 2)] * len(criteria)
 weights = st.text_input("Enter weights (comma-separated):", ",".join(map(str, default_weights)))
 impacts = st.text_input("Enter impacts for each criterion (+ for benefit, - for cost):", ",".join(["-"] + ["+"] * (len(criteria) - 1)))
@@ -98,10 +103,10 @@ st.dataframe(df_result.style.highlight_max("Closeness", axis=0, color="lightgree
 # ---------- Show Intermediate Matrices ----------
 with st.expander("Show Normalized and Weighted Matrices"):
     st.write("**Normalized Matrix:**")
-    st.dataframe(pd.DataFrame(norm_matrix, columns=criteria, index=df['Alternative']))
+    st.dataframe(pd.DataFrame(norm_matrix, columns=criteria, index=df["Alternative"]))
 
     st.write("**Weighted Normalized Matrix:**")
-    st.dataframe(pd.DataFrame(weighted_matrix, columns=criteria, index=df['Alternative']))
+    st.dataframe(pd.DataFrame(weighted_matrix, columns=criteria, index=df["Alternative"]))
 
 # ---------- Downloadable Output ----------
 def convert_df(df):
