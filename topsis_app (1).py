@@ -100,7 +100,7 @@ with st.expander("Show Normalized and Weighted Matrices"):
 # ---------- Downloadable Output ----------
 def convert_df(df):
     output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+   with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='TOPSIS Result')
     return output.getvalue()
 
