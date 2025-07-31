@@ -61,10 +61,4 @@ for i, criterion in enumerate(criteria):
     weights.append(weight)
     total_weight += weight
     
-    # Sidebar dropdown for impact type (+ for benefit, - for cost)
-    impact = st.sidebar.selectbox(f"Impact for {criterion}", options=["+", "-"], key=criterion)
-    impacts.append(impact)
-
-# Adjust the last slider if the total weight exceeds 1
-if total_weight > 1.0:
-    st.sidebar.warning(f"Warning: The sum of weights is {total_weight:.2f}. Adjusting the last weight to ensur_
+    #
